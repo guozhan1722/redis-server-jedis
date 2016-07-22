@@ -1,0 +1,87 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel
+  labels:
+    name: redis-sentinel
+    role: service
+spec:
+  ports:
+    - port: 26379
+      targetPort: 6379
+      targetPort: 26379
+  selector:
+    name: redis-sentinel
+    role: node
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-sentinel-init
+  labels:
+    name: redis-sentinel
+    role: node
+    init: "true"
+spec:
+  containers:
+    - name: redis-sentinel-init
+      image: aci-server/redis-sentinel-image:latest
+      env:
+        - name: MASTER
+          value: "true"
+      ports:
+        - containerPort: 6379
+        - containerPort: 26379
+      volumeMounts:
+        - name: redis-persistent-storage
+          mountPath: /etc/redis-data
+        - name: syslog
+          mountPath: /dev/log
+  volumes:
+    - name: redis-persistent-storage
+      emptyDir: {}
+    - name: syslog
+      hostPath:
+        path: /dev/log
+
+---
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redis-sentinel
+  labels:
+    name: redis-sentinel
+    role: rc
+spec:
+  replicas: 5
+  selector:
+    name: redis-sentinel
+    role: node
+  template:
+    metadata:
+      labels:
+        name: redis-sentinel
+        role: node
+    spec:
+     containers:
+     - name: redis-sentinel-node
+       image: aci-server/redis-sentinel-image:latest
+       ports:
+         - containerPort: 6379
+         - containerPort: 26379
+       volumeMounts:
+         - name: redis-persistent-storage
+           mountPath: /etc/redis-data
+         - name: syslog
+           mountPath: /dev/log
+     volumes:
+       - name: redis-persistent-storage
+         emptyDir: {}
+       - name: syslog
+         hostPath:
+           path: /dev/log
+        
+---

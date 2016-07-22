@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jedis-sentinel-example
+spec:
+  containers:
+    - name: jedis-sentinel-example
+      image: aci-server/jedis-sentinel-example-image:latest
