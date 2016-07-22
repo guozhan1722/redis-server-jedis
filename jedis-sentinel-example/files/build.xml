@@ -1,0 +1,66 @@
+<?xml version='1.0'?>
+<!--
+    Copyright Vecima Network Inc. as an unpublished work.
+    All Right Reserved.
+
+    The information contained herein is confidential property of
+    Vecima Networks Inc. The use, copying, transfer or disclosure of
+    such infomation is prohibited except by express written agreement
+    with Vecima Networks Inc.
+-->
+
+<project name="jedissentinelexample">
+    <!-- Load build time properties -->
+    <loadproperties srcFile="build.property"/>
+
+    <!-- Setup project specific properties -->
+    <property name="src.dir" value="${basedir}/src"/>
+    <property name="test.dir" value="${basedir}/test"/>
+    <property name="build.sysclasspath" value="first"/>
+
+    <path id="source-files.dir">
+       <dirset dir="${src.dir}">
+          <depth min="0"/>
+       </dirset>
+    </path>
+    <property name="source-dir.ref" refid="source-files.dir"/>
+    <basename property="package.dir" file="${source-dir.ref}"/>
+
+    <path id="java.files">
+       <fileset dir="${src.dir}">
+           <filename name="${package.dir}.java" casesensitive="no"/>
+       </fileset>
+    </path>
+    <property name="java.sources.ref" refid="java.files"/>
+    <basename property="class.name" file="${java.sources.ref}" suffix=".java"/>
+
+    <path id="package_dependencies.classpath">
+        <!-- Add package specific dependencies here -->
+    </path>
+
+    <path id="package_test_dependencies.classpath">
+        <!-- Add package specific test dependencies here -->
+    </path>
+
+    <!-- Setup the package manifest file -->
+
+    <manifestclasspath property="manifest.classpath"
+                       jarfile="${package.java_loc}/${package.name}-1.0.jar"
+                       maxParentLevels ="10">
+        <classpath refid="package_dependencies.classpath"/>
+    </manifestclasspath>
+
+    <manifest file="MANIFEST.MF">
+        <attribute name="Main-Class" value="jedissentinelexample.JedisSentinelExample"/>
+        <attribute name="Class-Path" value="commons-pool2.jar jedis.jar commons-cli.jar" />
+    </manifest>
+
+    <!-- Import the standard build -->
+    <path id="standard-build.path">
+        <fileset dir="${vcommon.base}">
+            <filename name="classes/standard-build.xml"/>
+        </fileset>
+    </path>
+    <property name="standard-build-ref" refid="standard-build.path"/>
+    <import file="${standard-build-ref}"/>
+</project>
